@@ -1,0 +1,17 @@
+{
+	"name": "RugbyScore",
+	"short_name": "RugbyScore",
+	"description": "Score a match. Share a link. Follow live.",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#06120c",
+	"theme_color": "#0a6b3a",
+	"icons": [
+		{
+			"src": "/icon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml",
+			"purpose": "any"
+		}
+	]
+}
