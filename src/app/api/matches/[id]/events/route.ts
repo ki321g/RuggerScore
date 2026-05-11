@@ -18,7 +18,12 @@ export async function POST(
 ) {
 	const { id } = await params;
 	await store.ready;
-	const m = store.get(id) ?? store.getByCode(id);
+	let m = store.get(id) ?? store.getByCode(id);
+	if (!m)
+		return NextResponse.json({ error: 'Match not found' }, { status: 404 });
+	// Reload from DB so we don't operate on stale in-memory state from a
+	// previous serverless invocation on another instance.
+	m = await store.reload(m.id);
 	if (!m)
 		return NextResponse.json({ error: 'Match not found' }, { status: 404 });
 

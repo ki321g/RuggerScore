@@ -216,6 +216,19 @@ export const persistence = {
 		return matches.map((m) => rowToMatch(m, byMatch.get(m.id) ?? []));
 	},
 
+	async loadOne(id: string): Promise<Match | null> {
+		const matches = await q<MatchRow>(
+			`SELECT * FROM matches WHERE id = $1 LIMIT 1`,
+			[id],
+		);
+		if (matches.length === 0) return null;
+		const events = await q<EventRow>(
+			`SELECT * FROM events WHERE match_id = $1 ORDER BY seq ASC`,
+			[id],
+		);
+		return rowToMatch(matches[0], events);
+	},
+
 	async createMatch(m: Match): Promise<void> {
 		await q(
 			`INSERT INTO matches (id, code, home_name, home_color, away_name, away_color, competition,

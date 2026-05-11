@@ -102,6 +102,27 @@ class MatchStore {
 		return id ? this.matches.get(id) : undefined;
 	}
 
+	/**
+	 * Reload a single match from the database into the in-memory cache.
+	 * Required on serverless (Vercel) where another instance may have mutated
+	 * the match since this instance last saw it. Returns the fresh Match,
+	 * or undefined if the match no longer exists.
+	 */
+	async reload(id: string): Promise<Match | undefined> {
+		const fresh = await persistence.loadOne(id);
+		if (!fresh) {
+			const stale = this.matches.get(id);
+			if (stale) {
+				this.matches.delete(id);
+				this.byCode.delete(stale.code);
+			}
+			return undefined;
+		}
+		this.matches.set(fresh.id, fresh);
+		this.byCode.set(fresh.code, fresh.id);
+		return fresh;
+	}
+
 	async create(input: {
 		homeName: string;
 		awayName: string;
